@@ -70,6 +70,7 @@ void toDo(Os &os)
         archiver = gem;
     }
     else if (os.get_archive_type() == ".zip") {
+    archiver = zip
     os.installation("unzip");
     unpack_cmd = {"unzip", os.get_path_to_archive(), "-d", (os.get_dirBuild() / os.get_archive_name())};
     }
@@ -100,9 +101,14 @@ void toDo(Os &os)
         {
             unpack_cmd.push_back(os.get_path_to_archive());
             unpack_cmd.push_back("-C");
-            unpack_cmd.push_back(os.get_dirBuild()/os.get_archive_name());
-            os.return_code_command(unpack_cmd);
-            cout<<"Архив разархивирован"<<"\n";
+            unpack_cmd.push_back(os.get_dirBuild() / os.get_archive_name());
+
+            int code = os.return_code_command(unpack_cmd);
+            if (code != 0) {
+                cerr << "Ошибка при распаковке архива" << "\n";
+                exit(1);
+            }
+cout << "Архив разархивирован" << "\n";
         }
 
         if(std::filesystem::exists(os.get_unpack_dir()/"CMakeLists.txt") && os.assembly_cmake() == 0) //CMake
@@ -168,7 +174,9 @@ void toDo(Os &os)
         }
         else cout<<"Не удалось собрать пакет"<<"\n";
     }
-
+    else {
+          cout << "Не удалось собрать пакет" << "\n";
+    }
 }
 }
 
