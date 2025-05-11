@@ -170,6 +170,7 @@ void toDo(Os &os)
     }
 
 }
+}
 
 
 string Unix::os_name(string command)
