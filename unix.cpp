@@ -203,7 +203,7 @@ void Unix::build_unpack_dir()
         type_arch = type_arch_tmp_one;
 
         // для двойных расширений, как .tar.gz
-        if (type_arch == ".gz"  type_arch == ".bz2"  type_arch == ".xz") {
+        if (type_arch == ".gz" || type_arch == ".bz2" || type_arch == ".xz") {
             string type_arch_tmp_two = path2.extension();
             type_arch = type_arch_tmp_two + type_arch_tmp_one;
         }
