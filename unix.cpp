@@ -205,14 +205,18 @@ void Unix::build_unpack_dir()
     type_archive = type_arch;
     cout << arch << "  " << type_arch << "\n";
 
-    filesystem::path path3("/tmp/archives");
-    path3 /= arch;
-    path3 /= "build-"+arch;
-    filesystem::create_directories(path3);
-
-    unpack_dir = "/tmp/archives/" + arch + "/" + arch;
-    build_dir = "/tmp/archives/" + arch + "/build-" + arch;
-
+    filesystem::path base_dir = "/tmp/archives";
+    base_dir /= arch;
+    filesystem::create_directories(base_dir / ("build-" + arch));                                                                                                     
+    for (const auto& entry : std::filesystem::directory_iterator(base_dir)) {
+        if (entry.is_directory()) {
+                if (std::filesystem::exists(entry.path() / "CMakeLists.txt")) {
+                        unpack_dir = entry.path();
+                        break;
+                }
+        }
+    }
+    build_dir = base_dir / ("build-" + arch);
     cout << unpack_dir << endl;
     cout << build_dir << endl;
 }
