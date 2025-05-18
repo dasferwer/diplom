@@ -68,31 +68,40 @@ void toDo(Os &os)
         os.install_gems();
         archiver = gem;
     }
-
+    else if (os.get_archive_type() == ".zip")
+    {
+    	os.installation("unzip");
+	vector<string> list_cmd = {"unzip", "-l",os.get_path_to_archive()};
+	os.return_code_command(list_cmd, true);
+    	unpack_cmd = {"unzip", os.get_path_to_archive(), "-d", (os.get_dirBuild() / os.get_archive_name()).string()};
+    }
     if(archiver == tar)
     {
-        os.installation("tar");
-        int mypipe[2];
-        if(pipe(mypipe))
-        {
-            perror("Ошибка канала");
-            exit(1);
-        }
-        vector<string> cmd = {"tar", "-tf", os.get_path_to_archive()};
-        //флаг -c говорит о том, что команды считываются из строки
-        if(os.run_command(cmd,false,mypipe) != 0)
-        {
-            cerr<<"Подозрительные файлы в архиве"<<"\n";
-            exit(1);
-        }
-        else
-        {
-            unpack_cmd.push_back(os.get_path_to_archive());
-            unpack_cmd.push_back("-C");
-            unpack_cmd.push_back(os.get_dirBuild()/os.get_archive_name());
-            os.return_code_command(unpack_cmd);
-            cout<<"Архив разархивирован"<<"\n";
-        }
+        if (os.get_archive_type() != ".zip")
+	{
+        	os.installation("tar");
+        	int mypipe[2];
+        	if(pipe(mypipe))
+        	{
+            		perror("Ошибка канала");
+            		exit(1);
+        	}
+        	vector<string> cmd = {"tar", "-tf", os.get_path_to_archive()};
+        	//флаг -c говорит о том, что команды считываются из строки
+        	if(os.run_command(cmd,false,mypipe) != 0)
+        	{
+            		cerr<<"Подозрительные файлы в архиве"<<"\n";
+            		exit(1);
+        	}
+        	else
+        	{
+            		unpack_cmd.push_back(os.get_path_to_archive());
+           	 	unpack_cmd.push_back("-C");
+            		unpack_cmd.push_back(os.get_dirBuild()/os.get_archive_name());
+            		os.return_code_command(unpack_cmd);
+            		cout<<"Архив разархивирован"<<"\n";
+        	}
+	}
 
         if(std::filesystem::exists(os.get_unpack_dir()/"CMakeLists.txt") && os.assembly_cmake() == 0) //CMake
         {
