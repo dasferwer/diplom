@@ -210,7 +210,13 @@ void Unix::build_unpack_dir()
     path3 /= "build-"+arch;
     filesystem::create_directories(path3);
 
-    unpack_dir = "/tmp/archives/" + arch + "/" + arch;
+    // Автоматически находит первую папку после распаковки
+    for (const auto& entry : std::filesystem::directory_iterator("/tmp/archives/" + arch)) {
+    	if (entry.is_directory()) {
+        	unpack_dir = entry.path();
+        	break;
+    	}
+    }		
     build_dir = "/tmp/archives/" + arch + "/build-" + arch;
 
     cout << unpack_dir << endl;
